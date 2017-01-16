@@ -1,0 +1,12 @@
+data/*
+*.pyc
+*.rec
+checkpoints/*
+cache/*
+*.params
+*.json
+*.pdf
+*.png
+*.jpg
+.DS_Store
+.ipynb_checkpoints
