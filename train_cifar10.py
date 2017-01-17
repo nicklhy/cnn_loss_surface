@@ -39,7 +39,7 @@ if __name__ == '__main__':
         # train
         batch_size      = 128,
         num_epochs      = 300,
-        model_period    = 100,
+        model_period    = 300,
         lr              = .05,
         lr_step_epochs  = '50,100,150,200,250',
         disp_batches    = 50,

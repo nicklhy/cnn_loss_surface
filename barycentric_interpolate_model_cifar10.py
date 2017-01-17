@@ -69,7 +69,7 @@ if __name__ == '__main__':
     data.set_data_aug_level(parser, 2)
     parser.set_defaults(
         # data
-        data_train     = train_fname,
+        data_train     = None,
         data_val       = val_fname,
         num_classes    = 10,
         num_examples  = 50000,
@@ -96,7 +96,7 @@ if __name__ == '__main__':
         context       = devs,
         symbol        = mx.sym.load(args.net_json)
     )
-    model.bind(data_shapes=train.provide_data, label_shapes=train.provide_label)
+    model.bind(data_shapes=val.provide_data, label_shapes=val.provide_label)
 
     # evaluation metrices
     eval_metrics = mx.metric.create('accuracy')

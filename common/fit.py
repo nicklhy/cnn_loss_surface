@@ -191,7 +191,8 @@ def fit(args, network, data_loader, **kwargs):
                       aux_params=aux_params)
     #  save the initialized weights
     arg_params, aux_params = model.get_params()
-    checkpoint(-1, model.symbol, arg_params, aux_params)
+    if 'params' not in args or args.params is None:
+        checkpoint(-1, model.symbol, arg_params, aux_params)
 
     # evaluation metrices
     eval_metrics = ['accuracy']
