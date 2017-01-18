@@ -4,19 +4,10 @@ import cPickle
 import logging
 logging.basicConfig(level=logging.DEBUG)
 from common import find_mxnet, data
-from common.util import download_file
 import mxnet as mx
 import numpy as np
 
 ROOT_DIR = os.path.abspath(os.path.dirname(__file__))
-
-def download_cifar10():
-    data_dir="data"
-    fnames = (os.path.join(data_dir, "cifar10_train.rec"),
-              os.path.join(data_dir, "cifar10_val.rec"))
-    download_file('http://data.mxnet.io/data/cifar10/cifar10_val.rec', fnames[1])
-    download_file('http://data.mxnet.io/data/cifar10/cifar10_train.rec', fnames[0])
-    return fnames
 
 def load_params(filename):
     params = {
@@ -35,11 +26,10 @@ def load_params(filename):
 
 
 if __name__ == '__main__':
-    # download data
-    (train_fname, val_fname) = download_cifar10()
-
     parser = argparse.ArgumentParser(description="interpolate score",
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('--dataset', type=str, default='cifar10',
+                        choices=['cifar10', 'mnist'], help='dataset to use')
     parser.add_argument('--net-json', type=str, required=True,
                         help='symbol\'s json file')
     parser.add_argument('--params1', type=str, required=True,
@@ -70,7 +60,7 @@ if __name__ == '__main__':
     parser.set_defaults(
         # data
         data_train     = None,
-        data_val       = val_fname,
+        data_val       = 'data/cifar10_val.rec',
         num_classes    = 10,
         num_examples  = 50000,
         image_shape    = '3,28,28',
@@ -85,7 +75,10 @@ if __name__ == '__main__':
     params3 = load_params(args.params3)
 
     kv = mx.kvstore.create(args.kv_store)
-    train, val = data.get_rec_iter(args, kv)
+    if args.dataset == 'cifar10':
+        train, val = data.get_rec_iter(args, kv)
+    elif args.dataset == 'mnist':
+        train, val = data.get_mnist_iter(args, kv)
 
     # devices for training
     devs = mx.cpu() if args.gpus is None or args.gpus is '' else [
@@ -139,6 +132,7 @@ if __name__ == '__main__':
     if args.output is None:
         args.output = os.path.join(ROOT_DIR,
                                    'cache',
+                                   args.dataset,
                                    os.path.split(args.params1)[-1].replace('.params', '')+'_'+os.path.split(args.params2)[-1].replace('.params', '')+'_'+os.path.split(args.params3)[-1].replace('.params', '')+'_triplet_interpolate.pkl')
         if not os.path.exists(os.path.dirname(args.output)):
             os.mkdir(os.path.dirname(args.output))
